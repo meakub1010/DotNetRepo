@@ -1,0 +1,32 @@
+:root {
+    --bg-color: #ffffff;
+    --text-color: #000000;
+    --link-color: #1a0dab;
+    --header-bg: #f0f0f0;
+    --card-bg: #ffffff;
+    --border-color: #dcdcdc;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+a {
+    color: var(--link-color);
+}
+
+header, footer {
+    background-color: var(--header-bg);
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 6px;
+}
