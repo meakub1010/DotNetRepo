@@ -462,8 +462,79 @@ Cluster
     
 
 
+### What is the difference between a Pod and a Deployment?
+A Pod is a single instance of a running process in your cluster. A Deployment manages Pods and ensures the desired number of replicas are running and updated.
 
+### How do you expose a service in Kubernetes?
+Use a Service (ClusterIP for internal, NodePort or LoadBalancer for external), or Ingress for HTTP routing.
 
-**Cluster**
-- K8 cluster is set of machines called nodes that used to run containerized applications
-- 
+kubectl expose deployment myapp --type=LoadBalancer --port=80
+
+### What is a ConfigMap vs Secret?
+ConfigMap stores non-sensitive config.
+
+Secret stores sensitive info like API keys (base64 encoded).
+
+### What is a Namespace and when would you use it?
+A namespace provides scope for resources. Use it for separating environments (dev, test, prod) or by teams.
+
+### How does rolling update work in Kubernetes?
+A Deployment updates pods incrementally using strategies like RollingUpdate. It replaces old pods gradually with new ones to avoid downtime.
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 1
+    maxSurge: 1
+### What is a PersistentVolume and PersistentVolumeClaim?
+PV: actual storage resource in the cluster.
+
+PVC: user's request for storage (claim).
+
+###  What is a DaemonSet?
+A DaemonSet ensures that a copy of a pod runs on every node. Great for logging agents, monitoring, etc.
+
+### How do you troubleshoot a failed Pod?
+`kubectl describe pod <pod-name> – events & errors
+
+kubectl logs <pod-name> – stdout logs
+
+kubectl exec -it <pod-name> -- bash – shell access`
+
+### What is the role of etcd in Kubernetes?
+Answer:
+etcd is a distributed key-value store used by Kubernetes to store all cluster data and state.
+
+### What is Helm?
+Helm is a package manager for Kubernetes that allows you to define, install, and upgrade complex K8s applications using charts.
+
+### YAML Example: Simple Deployment + Service
+`apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+        - name: myapp
+          image: myapp:latest
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-service
+spec:
+  selector:
+    app: myapp
+  ports:
+    - port: 80
+  type: LoadBalancer`
