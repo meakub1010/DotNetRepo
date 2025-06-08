@@ -2,6 +2,22 @@ using Microsoft.EntityFrameworkCore;
 using RazorPagesMovie.Models;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
+using Polly;
+
+static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
+{
+    Console.WriteLine("Registering retry policy for HttpClient...");
+    return Policy<HttpResponseMessage>
+    .Handle<HttpRequestException>()
+    .WaitAndRetryAsync(
+        retryCount: 3,
+        sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(600),
+        onRetry: (outcome, timespan, retryAttempt, context) =>
+        {
+            // Log the retry attempt
+            Console.WriteLine($"Retry {retryAttempt} after {timespan.TotalSeconds} seconds");
+        });
+ }
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,7 +43,7 @@ builder.Services.AddRateLimiter(options =>
     options.AddFixedWindowLimiter("Fixed", opt =>
     {
         opt.Window = TimeSpan.FromSeconds(10);
-        opt.PermitLimit = 5; // allow 5 requests per 10 seconds
+        opt.PermitLimit = 10; // allow 10 requests per 10 seconds
         opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
         opt.QueueLimit = 2;
     });
@@ -55,11 +71,17 @@ builder.Services.AddRateLimiter(options =>
     });
 });
 // Add services to the container.
+builder.Services.AddHttpClient("ExternalApi", client => { client.BaseAddress = new Uri("https://jsonplaceholder.typicode.com"); })
+    .AddPolicyHandler(GetRetryPolicy()); // register HttpClient with retry policy
 builder.Services.AddRazorPages();
 builder.Services.AddControllers();
-
+builder.Services.AddScoped<ExternalApiService>(); // register ExternalApiService
 builder.Services.Configure<ThemeSettings>(
     builder.Configuration.GetSection("Theme"));
+
+builder.Logging.ClearProviders(); // clear default logging providers
+builder.Logging.AddConsole(); // add console logging
+builder.Logging.AddDebug(); // add debug logging
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -140,5 +162,5 @@ app.UseAuthorization();
 app.MapStaticAssets();
 app.MapRazorPages()
    .WithStaticAssets();
-app.MapControllers().RequireRateLimiting("Fixed"); // apply rate limiting to controllers
+app.MapControllers();//.RequireRateLimiting("Fixed"); // apply rate limiting to controllers
 app.Run();
