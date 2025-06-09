@@ -536,3 +536,13 @@ spec:
   ports:
     - port: 80
   type: LoadBalancer`
+
+  ### HTTP status code usage
+  | HTTP Verb         | Status Code | When?                              |
+| ----------------- | ----------- | ---------------------------------- |
+| `GET /users`      | 200         | Returns a list of users            |
+| `POST /users`     | 201         | A user was created                 |
+| `DELETE /users/5` | 204         | User deleted, no content to return |
+| `PUT /users/5`    | 200 or 204  | User updated                       |
+| `GET /unknown`    | 404         | User doesn't exist                 |
+
