@@ -214,8 +214,8 @@ Note: this keyword in the parameter tells the compiler it's an extension method
 `
 ### Operator Overloading
 - let overload operators for custom behavior in your class
-`
-public class Money {
+
+`public class Money {
     public static bool operator ==(Money m1, Money m2){
         return m1.Amount == m2.Amount;
     }
@@ -223,12 +223,10 @@ public class Money {
         return !(m1 == m2);
     }
 }
-
 // usage
 Money a = new Money { Amount = 100 };
 Money b = new Money { Amount = 100 };
-Console.WriteLine(a == b); // true
-`
+Console.WriteLine(a == b); // true`
 
 ### Thread vs Task
 **Thread**
