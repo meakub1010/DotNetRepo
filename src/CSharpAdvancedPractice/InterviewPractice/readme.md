@@ -552,7 +552,7 @@ spec:
 - Implement async Task InvokeAsync(HttpContext context)
 - after the work is done for custom middleware call next middleware await next(context)
 
-code:
+**Create custom middleware:**
 ```
 public class MyCustomMiddleware
 {
@@ -574,8 +574,8 @@ public class MyCustomMiddleware
         Console.WriteLine($"[Middleware] Response: {context.Response.StatusCode}");
     }
 }
-
-#Create extension method for clean usage#
+```
+**Create extension method for clean usage**
 
 ```
 public static class MyCustomMiddlewareExtensions
@@ -587,7 +587,7 @@ public static class MyCustomMiddlewareExtensions
 }
 
 ```
-#Register the middleware in the Pipeline(Program.cs)#
+**Register the middleware in the Pipeline(Program.cs)**
 
 ```
 var builder = WebApplication.CreateBuilder(args);
