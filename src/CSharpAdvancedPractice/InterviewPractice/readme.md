@@ -28,7 +28,8 @@ it provides
 
 ### STACK - Value Type:
 
-`int x = 5;
+```
+int x = 5;
 int y = x; // copy of x is assigned to y
 
 y = 10; // x is still 5, because value is copied`
@@ -42,10 +43,10 @@ Person p1 = new Person { name = "Alice" };
 Person p2 = p1;
 
 p2.name = "Bob";
+```
+_now p1.name is also "Bob" beacause they point to same reference or heap object_
 
-// now p1.name is also "Bob" beacause they point to same reference or heap object`
-
-Important notes on STACK and HEAP memory
+### Important notes on STACK and HEAP memory
 
 - both are allocated in RAM
 - **STACK** is allocated on the lower part of the RAM and HEAP is allocated on the upper portion of the RAM
@@ -54,8 +55,10 @@ Important notes on STACK and HEAP memory
 - **HEAP** managed by GC(Random)
 - In .NET we can specifies stack size while creating thread
 
-`var thread = new Thread(SomeMethod, stackSize: 2 * 1024 * 1024);
-thread.start();`
+```
+var thread = new Thread(SomeMethod, stackSize: 2 * 1024 * 1024);
+thread.start();
+```
 
 Memory Layout (simplified):
 
@@ -71,7 +74,7 @@ Memory Layout (simplified):
 +------------------------------+
 
 
-### STRUCT
+### STRUCT 
 struct is a value type to encapsulate small group of related variables kind of similar to class but with important differences in memeory
 allocation, performance and use cases.
 - allocated on stack since value type
@@ -83,7 +86,7 @@ allocation, performance and use cases.
 
 ### FACTORY PATTERN
 
-- factory pattern is used to create objects without exposing the creation logic to the client. It provides a layer of abstraction
+- **Factory Pattern** is used to create objects without exposing the creation logic to the client. It provides a layer of abstraction
 over the instantiation process
 - code reference FactoryPatternExample.cs
 
@@ -98,7 +101,7 @@ when to use Factory pattern
 - is used to abstract the data access logic from the business logic
 - it acts like an in-memory collection for the domain but actually interacts with database
 
-Factory vs Repository Pattern
+**Factory vs Repository Pattern**
 - purpose of factory pattern is to create object but repository pattern is data access abstraction 
 - factory return instance but repository returns domain/entity objects 
 - use factory when instantiation logic is complex, use repository when seperate business logics from data
@@ -198,7 +201,7 @@ Factory vs Repository Pattern
 - decode JWT via jwt.io and verify claims
 
 ### Extension Methods
-`
+```
 public static class StringExtensions {
     public static bool IsEmail(this string input){
         return input.Contains("@") && input.Contains(".");
@@ -208,14 +211,14 @@ public static class StringExtensions {
 // usage
 string email = "muhammad@gmai.com";
 bool isValid = email.IsEmail(); // true
+```
+_**Note:** this keyword in the parameter tells the compiler it's an extension method_
 
-Note: this keyword in the parameter tells the compiler it's an extension method
-
-`
 ### Operator Overloading
 - let overload operators for custom behavior in your class
 
-`public class Money {
+```
+public class Money {
     public static bool operator ==(Money m1, Money m2){
         return m1.Amount == m2.Amount;
     }
@@ -227,7 +230,7 @@ Note: this keyword in the parameter tells the compiler it's an extension method
 Money a = new Money { Amount = 100 };
 Money b = new Money { Amount = 100 };
 Console.WriteLine(a == b); // true`
-
+```
 ### Thread vs Task
 **Thread**
 - is a low level concept. It provides control over individual threads and works directly with the system's threading infrastructure
@@ -238,7 +241,7 @@ Console.WriteLine(a == b); // true`
 - P -> use thread pools
 - P -> parallel processing
 - P -> Plus( support return result, cancel, chain, async, await)
-`
+```
 // Using Thread
 Thread thread = new Thread(() => 
 {
@@ -252,14 +255,13 @@ Task task = Task.Run(() =>
     Console.WriteLine("Task started");
 });
 task.Wait();
-
-`
+```
 ### What is the use of async and await in multithreading?
 - async and await are used to simplify asynchronous programming
 - async marks method as asynchronous
 - await is used to wait for the completion of a task
 - usefull in UI apps to keep the UI responsive
-`
+```
 public async Task<int> GetDataAsync()
 {
     var result = await Task.Run(() =>
@@ -276,7 +278,7 @@ public async Task ExecuteAsync()
     int data = await GetDataAsync();
     Console.WriteLine($"Data received: {data}");
 }
-`
+```
 ### Explain ThreadPool and Task Parallel Library(TPL) in .NET
 
 **ThreadPool**
@@ -285,8 +287,10 @@ public async Task ExecuteAsync()
 **TPL**
 - builds on the threadpool to provide a higher level abstraction for scheduling work, running tasks in parallel, handling continuations
 
-Code using TPL
-`using System;
+**Code using TPL**
+
+```
+using System;
 using System.Threading.Tasks;
 
 class Program
@@ -314,7 +318,7 @@ class Program
         Console.ReadLine(); // Prevent the application from closing immediately
     }
 }
-`
+```
 
 ### How do you manage Thread synchronizatin in .NET
 - **lock**, ensure that only one thread executes the critical section at a time. it's a syntactic sugar for **Monitor.Enter/Monitor.Exit**
@@ -323,7 +327,8 @@ class Program
 - **Semaphore**, allows limiting the number of thread that can access a resource concurrently
 
 **Lock:**
-`using System;
+```
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -347,7 +352,7 @@ class Program
         // Expected output: Final counter value: 1000
     }
 }
-`
+```
 ### What is Deadlock and how can you prevent them in a multi-threaded .net application
 - deadlock occurs when two or more threads are waiting indefinitelty for resources locked by each other.
 
@@ -361,7 +366,8 @@ class Program
 
 - Thread-safe lazy initialization ensures that an object is created only once, even when multiple threads attempt to access it concurrently
 **Code**
-`using System;
+```
+using System;
 
 class Program
 {
@@ -391,7 +397,7 @@ class HeavyObject
         Console.WriteLine("HeavyObject instance is now in use.");
     }
 }
-`
+```
 
 
 ### Kubernetes
