@@ -104,15 +104,15 @@ Factory vs Repository Pattern
 - use factory when instantiation logic is complex, use repository when seperate business logics from data
 - Example: Factory - Vehicle Factory, Repository - product repository manages product entities
 
-### Ciccuit Breaker Pattern
+### Circuit Breaker Pattern
 - Circuit breaker pattern has a different purpose than the "Retry pattern"
-- Retry pattern enanles application to retry an operation in the exception that the operation will eventually succeed
+- Retry pattern enables application to retry an operation in the exception that the operation will eventually succeed
 - Circuit breaker prevents application performing an operation that likely to fail
 - An application can combine both of these pattern but retry logic should be sensitive and it should abandon retry attempts if the circuit breaker indicates that a fault is not transient
 
 
 ### Scenario: Application Suddenly Crashes in Production
-**Problem:** .NET cor API crashes intermittently without clear logs
+**Problem:** .NET core API crashes intermittently without clear logs
 
 **How to Troubleshoot**
 1. Check events viewer or system logs for unhandled exceptions or memory access violations
@@ -546,3 +546,56 @@ spec:
 | `PUT /users/5`    | 200 or 204  | User updated                       |
 | `GET /unknown`    | 404         | User doesn't exist                 |
 
+### How to write custom middleware in .net
+
+- Create class with constructor that accept (RequestDelegate next) as param
+- Implement async Task InvokeAsync(HttpContext context)
+- after the work is done for custom middleware call next middleware await next(context)
+
+code:
+```
+public class MyCustomMiddleware
+{
+    private readonly RequestDelegate _next;
+
+    public MyCustomMiddleware(RequestDelegate next)
+    {
+        _next = next;
+    }
+
+    public async Task InvokeAsync(HttpContext context)
+    {
+        // Before the next middleware
+        Console.WriteLine($"[Middleware] Request: {context.Request.Method} {context.Request.Path}");
+
+        await _next(context); // Call the next middleware
+
+        // After the next middleware
+        Console.WriteLine($"[Middleware] Response: {context.Response.StatusCode}");
+    }
+}
+
+#Create extension method for clean usage#
+
+```
+public static class MyCustomMiddlewareExtensions
+{
+    public static IApplicationBuilder UseMyCustomMiddleware(this IApplicationBuilder builder)
+    {
+        return builder.UseMiddleware<MyCustomMiddleware>();
+    }
+}
+
+```
+#Register the middleware in the Pipeline(Program.cs)#
+
+```
+var builder = WebApplication.CreateBuilder(args);
+var app = builder.Build();
+
+app.UseMyCustomMiddleware(); // 👈 Custom middleware goes here
+
+app.MapControllers(); // Or app.Run(...) if using minimal API
+app.Run();
+
+```
