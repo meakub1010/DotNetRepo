@@ -248,6 +248,59 @@ WITH HighEarners AS (
 SELECT * FROM HighEarners;
 ```
 
+### Temp table Vs Temp Variable
+In SQL Server, temporary tables and table variables are both used to store temporary data — but they have different performance, scope, and use cases.
+
+**Temporary Table**
+```SQL
+CREATE TABLE #TempTable (
+    id INT,
+    name VARCHAR(100)
+);
+```
+
+**Table Varaible**
+```SQL
+DECLARE @TempVar TABLE (
+    id INT,
+    name VARCHAR(100)
+)
+```
+
+**Example**
+**✅ Table Variable:**
+```SQL
+DECLARE @Products TABLE (product_id INT, name VARCHAR(50));
+INSERT INTO @Products VALUES (1, 'Apple'), (2, 'Orange');
+SELECT * FROM @Products;
+```
+**✅ Temp Table:**
+```SQL
+CREATE TABLE #Products (product_id INT, name VARCHAR(50));
+INSERT INTO #Products VALUES (1, 'Apple'), (2, 'Orange');
+SELECT * FROM #Products;
+```
+**Global Temp Table**
+```SQL
+CREATE TABLE ##GlobalTempTable
+-- visible across all sessions
+```
+
+
+**🔍 2. Key Differences**
+| Feature               | #Temporary Table (`#TempTable`) | @Table Variable (`@TempVar`)        |
+| --------------------- | ------------------------------- | ----------------------------------- |
+| **Scope**             | Connection/session level        | Batch/procedure level               |
+| **Transaction log**   | Logged like regular tables      | Minimal logging                     |
+| **Indexes**           | Can add indexes explicitly      | Limited (no explicit non-clustered) |
+| **Statistics**        | Has statistics (optimizer uses) | No statistics                       |
+| **Performance**       | Better for large data           | Better for small datasets           |
+| **Persistence**       | Exists in `tempdb`              | In memory, also tempdb backed       |
+| **ALTER allowed**     | Yes                             | ❌ No `ALTER` on structure           |
+| **Used in recursion** | Yes                             | Not allowed in recursive CTE        |
+| **Parallelism**       | Supported                       | Not supported                       |
+
+
 ### ADVANCED SQL QUERY 
 
 
