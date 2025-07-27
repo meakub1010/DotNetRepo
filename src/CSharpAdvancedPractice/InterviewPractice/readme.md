@@ -605,3 +605,207 @@ app.MapControllers(); // Or app.Run(...) if using minimal API
 app.Run();
 
 ```
+
+### Create singleton servie
+- sealed class
+- private static instance
+- private constructor
+- public attribute to read singleton instance
+- public method to do the activities
+
+**Code**
+```
+public interface ILoggerService
+{
+    public void Log(string message);
+}
+public sealed class LoggerService : ILoggerService // sealed class
+{
+    // read only private instance
+    private static readonly LoggerService _instance = new LoggerService();
+
+    // private constructor
+    private LoggerService()
+    {
+        // initialize resource if needed
+    }
+
+    // public static member to access the instance
+    public static LoggerService Instance => _instance;
+
+    public void Log(string message)
+    {
+        Console.WriteLine($"[LOG - {DateTime.Now}] {message}");
+    }
+}
+```
+**Register with .net**
+```
+services.AddSingleton<ILoggerService, LoggerService>();
+```
+
+### When Singleton is Recommended
+- Stateless shared services
+- When you need a single shared configuration that doesn't change during runtime.
+- When creating the object is expensive and you want to reuse it (e.g., DB connection factory, thread pool manager).
+
+
+### When Singleton is not recommended
+- If the class holds mutable state that varies per user or session, singleton can cause shared-state bugs.
+- Hard to test and maintain
+- If not implemented correctly, can cause race conditions or data corruption.
+
+### Best practice: Use DI with Singleton Lifetime
+In modern frameworks (e.g., ASP.NET Core), you don't implement singletons manually. You let the DI container manage the lifetime:
+**Code**
+```
+public interface IMyService { }
+public class MyService : IMyService { }
+
+// Register in Startup.cs or Program.cs
+services.AddSingleton<IMyService, MyService>();
+
+```
+
+### Inheritence Vs Decorator Pattern
+
+**Inheritence**
+- inheritence happens compile time, we need to implement subclass for every combination
+- this is not flexible, we need to use composition instead of inheritence
+
+**DECORATOR PATTERN**
+- Decorator pattern allows us to add new functionality to an existing object without altering its structure
+- It is achieved by creating a set of decorator classes that are used to wrap concrete components
+
+**Implement Decorator Pattern**
+- Create interface(ICoffee)
+- Create decorator with constructor that receive ICoffee and also implements ICoffee
+- Inside the decorator within the ICoffe member functions you get base cost and base flavor plus add new flavor and cost based on with decorator you are in
+- and we keep wrapping plain coffee with multiple decorators
+
+
+**Code for Inheritence**
+```
+public class Coffee
+{
+    public virtual string GetDescription()
+    {
+        return "Coffee";
+    }
+
+    public virtual double GetCost()
+    {
+        return 2.0; // Base cost of coffee
+    }
+}
+public class MilkCoffee : Coffee
+{
+    public override string GetDescription()
+    {
+        return base.GetDescription() + ", Milk";
+    }
+
+    public override double GetCost()
+    {
+        return base.GetCost() + 0.5; // Additional cost for milk
+    }
+}
+
+// and so on for other add-ons like Sugar, Whipped Cream, etc.
+public class SugarCoffee : MilkCoffee
+{
+    public override string GetDescription()
+    {
+        return base.GetDescription() + ", Sugar";
+    }
+
+    public override double GetCost()
+    {
+        return base.GetCost() + 0.2; // Additional cost for sugar
+    }
+}
+```
+
+**Code for Decorator**
+```
+public interface ICoffee
+{
+    string GetDescription();
+    double GetCost();
+}
+
+public class PlainCoffee : ICoffee
+{
+    public string GetDescription()
+    {
+        return "Plain Coffee";
+    }
+
+    public double GetCost()
+    {
+        return 2.0; // Base cost of coffee
+    }
+}
+
+public class MilkDecorator : ICoffee
+{
+    private readonly ICoffee _coffee;
+
+    public MilkDecorator(ICoffee coffee)
+    {
+        _coffee = coffee;
+    }
+
+    public string GetDescription()
+    {
+        return _coffee.GetDescription() + ", Milk";
+    }
+
+    public double GetCost()
+    {
+        return _coffee.GetCost() + 0.5; // Additional cost for milk
+    }
+}
+
+public class SugarDecorator : ICoffee
+{
+    private readonly ICoffee _coffee;
+
+    public SugarDecorator(ICoffee coffee)
+    {
+        _coffee = coffee;
+    }
+
+    public string GetDescription()
+    {
+        return _coffee.GetDescription() + ", Sugar";
+    }
+
+    public double GetCost()
+    {
+        return _coffee.GetCost() + 0.2; // Additional cost for sugar
+    }    
+}
+```
+
+**Usage Example**
+
+```
+public class DecoratorInheritenceExample
+{
+    public static void Main(string[] args)
+    {
+        ICoffee coffee = new PlainCoffee();
+        Console.WriteLine($"{coffee.GetDescription()} - ${coffee.GetCost()}");
+        coffee = new MilkDecorator(coffee);
+        Console.WriteLine($"{coffee.GetDescription()} - ${coffee.GetCost()}");
+        coffee = new SugarDecorator(coffee);
+        Console.WriteLine($"{coffee.GetDescription()} - ${coffee.GetCost()}");
+        // Output:
+        // Plain Coffee - $2.0
+        // Plain Coffee, Milk - $2.5  
+        // Plain Coffee, Milk, Sugar - $2.7
+        // This allows us to dynamically add functionality without modifying the original object  
+    }
+}
+```
