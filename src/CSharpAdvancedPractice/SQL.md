@@ -286,7 +286,6 @@ CREATE TABLE ##GlobalTempTable
 -- visible across all sessions
 ```
 
-
 **🔍 2. Key Differences**
 | Feature               | #Temporary Table (`#TempTable`) | @Table Variable (`@TempVar`)        |
 | --------------------- | ------------------------------- | ----------------------------------- |
@@ -299,6 +298,77 @@ CREATE TABLE ##GlobalTempTable
 | **ALTER allowed**     | Yes                             | ❌ No `ALTER` on structure           |
 | **Used in recursion** | Yes                             | Not allowed in recursive CTE        |
 | **Parallelism**       | Supported                       | Not supported                       |
+
+
+### Normalization
+**Normalization** is the process of organizing data in a database to reduce redundancy and improve data integrity. The goal is to **divide large tables into smaller**, related ones and ensure dependencies make sense. It follows a series of "normal forms" (rules) that help refine the structure of your database.
+
+#### Example
+
+**🧱 Unnormalized Table (UNF)**
+| StudentID | Name       | Courses       |
+| --------- | ---------- | ------------- |
+| 1         | John Doe   | Math, Science |
+| 2         | Jane Smith | History, Math |
+
+
+#### 1️⃣ First Normal Form (1NF)
+**Rule:** No repeating groups or arrays. All entries must be atomic (**single value per field**).
+| StudentID | Name       | Course  |
+| --------- | ---------- | ------- |
+| 1         | John Doe   | Math    |
+| 1         | John Doe   | Science |
+| 2         | Jane Smith | History |
+| 2         | Jane Smith | Math    |
+
+#### 2️⃣ Second Normal Form (2NF)
+Rule: Must be in 1NF and all non-key columns must depend on the whole primary key (**no partial dependency**).
+
+Composite key: (StudentID, Course)
+
+Split into two tables:
+
+**Student**
+
+| StudentID | Name       |
+| --------- | ---------- |
+| 1         | John Doe   |
+| 2         | Jane Smith |
+
+**StudentCourses**
+
+| StudentID | Course  |
+| --------- | ------- |
+| 1         | Math    |
+| 1         | Science |
+| 2         | History |
+| 2         | Math    |
+
+#### 3️⃣ Third Normal Form (3NF)
+Rule: Must be in 2NF and no transitive dependencies (non-key column depending on another non-key column).
+
+Assume we added a column "Department" based on Course:
+
+| StudentID | Course | Department |
+| --------- | ------ | ---------- |
+| 1         | Math   | Science    |
+
+**_This violates 3NF — "Department" depends on "Course", not "StudentID"._**
+
+**Fix:**
+
+**Courses**
+| Course  | Department |
+| ------- | ---------- |
+| Math    | Science    |
+| Science | Science    |
+| History | Arts       |
+
+Then update **StudentCourses:**
+| StudentID | Course |
+| --------- | ------ |
+| 1         | Math   |
+
 
 
 ### ADVANCED SQL QUERY 
