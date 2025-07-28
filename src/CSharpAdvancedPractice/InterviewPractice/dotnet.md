@@ -541,7 +541,7 @@ services.AddSingleton<IMyService, MyService>();
 
 
 **Code for Inheritence**
-```
+```C#
 public class Coffee
 {
     public virtual string GetDescription()
@@ -583,7 +583,7 @@ public class SugarCoffee : MilkCoffee
 ```
 
 **Code for Decorator**
-```
+```C#
 public interface ICoffee
 {
     string GetDescription();
@@ -646,7 +646,7 @@ public class SugarDecorator : ICoffee
 
 **Usage Example**
 
-```
+```C#
 public class DecoratorInheritenceExample
 {
     public static void Main(string[] args)
@@ -665,3 +665,51 @@ public class DecoratorInheritenceExample
     }
 }
 ```
+
+### .NET Services
+
+## 1. Transient
+
+**What it is:** A new instance of the service is created every time it's requested from the DI container. This means if a service is injected into multiple places within a single request, each injection will get a fresh instance.
+
+**When to use it:**
+
+- **Stateless, Lightweight Operations:** Ideal for services that perform operations without relying on internal state or shared data across requests.
+- **Disposable Services:** Suitable for services that need to be created, used, and then disposed of immediately after their use.
+- **Utility Services:** Examples include formatters, mappers, or simple calculation services that do not maintain any state, says Medium.
+- **Multithreading:** Can be a good choice for multithreading operations as each thread gets its own instance, according to ByteHide.
+- **Considerations:** Overusing transient for heavy or expensive services can lead to performance degradation due to the frequent instantiation, notes codewithmukesh. 
+
+## 2. Scoped
+
+**What it is:** A new instance of the service is created once per client request (typically an HTTP request) and shared across all components that participate in that request. This instance is then disposed of when the request ends.
+
+**When to use it:**
+
+- **Request-Specific Operations:** Perfect for services that need to share context or state within the scope of a single request, but should not persist across different requests.
+
+- **Database Contexts:** Commonly used for database contexts like **DbContext in Entity Framework**, ensuring all operations within a single request use the same database connection and context, avoiding inconsistencies or multiple connections, according to codewithmukesh.
+
+- **Unit of Work Patterns:** Well-suited for implementing the Unit of Work pattern, where all database operations within a request are managed as a single transaction.
+User-Specific Data: For services caching or managing user-specific data during a request, according to Medium.
+
+- **Considerations:** Scoped services should not be injected directly into Singleton services as this can lead to runtime errors or unexpected behavior because a singleton lives longer than a scope, according to codewithmukesh. 
+
+## 3. Singleton
+
+**What it is:** Only one instance of the service is created for the entire lifetime of the application, and this same instance is shared across all requests and consumers.
+
+**When to use it:**
+
+- **Stateless Services:** Ideal for services that do not maintain any internal state and can be safely shared across the entire application.
+Configuration: Services providing configuration settings that are constant for the application's duration.
+
+- **Caching Services:** For application-wide caches or shared resources accessed by many components.
+
+- **Logging Services:** Centralized logging services that need to be accessible from all parts of the application, says Medium.
+
+- **Expensive Initialization:** When a service is expensive to create or initialize, and you only need one instance for the entire application, according to Reddit.
+
+- **Considerations:** Since singleton services are shared across all threads, you must ensure they are thread-safe if they maintain any mutable state, notes Reddit. Avoid injecting Scoped or Transient services directly into a Singleton, as this can lead to issues due to the lifetime mismatch.
+
+### Best Practices
